@@ -1,0 +1,17 @@
+{
+	"name": "tweetnode",
+	"version": "0.0.0",
+	"description": "Twitter stream api in nodejs and websocket",
+	"main": "server.js",
+	"dependencies": {
+		"express": "~3.1.0",
+		"socket.io": "1.0.6",
+		"jade": "latest",
+		"ntwitter": "latest"
+	},
+	"scripts": {
+	"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Abhishek Dewadiga",
+	"license": "ISC"
+}
