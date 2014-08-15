@@ -7,14 +7,14 @@ var express = require('express'),
 	port = process.env.PORT || 3000;
 
 // Twitter account configuration
-var twit = new twitter({
+var tw = new twitter({
 		consumer_key: 'v7PaG6aaPvtmdAo6VnSNeTHC8',
 		consumer_secret: 't0jUYGdI8R9GtimQxpo6PLgHgB6kvbpNpnrNzB8Z0BxeCUQ5DB',
 		access_token_key: '89122938-tBIb72limYikzyAGpRPlTWOm4ofYHp4SQZRmWEkG9',
 		access_token_secret: 'l8FjFLsJNcmhvlO963rrDixVbowr7buR0ZkIZUSsM81uE'
 	}),
 	stream = null,
-	track = "football",
+	track = "robin williams",
 	users = [];
 
 // Init app
@@ -67,7 +67,7 @@ io.sockets.on('connection', function (socket) {
 		console.log('User connected ' + socket.id);
 	}
 
-	socket.on('start stream', funcion () {
+	socket.on('start stream', function () {
 		if (stream === null) {
 			tw.stream("statuses/filter", {
 				track: track
@@ -110,4 +110,10 @@ io.sockets.on('connection', function (socket) {
             users.splice(index, 1);
         }
 	});
+
+	// Emits signal when the user is connected sending
+    // the tracking words the app it's using
+    socket.emit("connected", {
+        tracking: track
+    });
 });
