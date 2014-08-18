@@ -7,7 +7,7 @@
 		"express": "~3.1.0",
 		"socket.io": "1.0.6",
 		"jade": "latest",
-		"ntwitter": "latest"
+		"twit": "1.1.18"
 	},
 	"scripts": {
 	"test": "echo \"Error: no test specified\" && exit 1"
