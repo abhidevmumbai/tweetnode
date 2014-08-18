@@ -14,8 +14,8 @@ var T = new twitter({
 		access_token_secret: 'l8FjFLsJNcmhvlO963rrDixVbowr7buR0ZkIZUSsM81uE'
 	}),
 	stream = null,
-	track_keywords = 'robin williams',
-	search_keywords = 'web since:2011-11-11'
+	track_keywords = 'css, html',
+	search_keywords = 'html5 since:2013-11-11',
 	users = [];
 
 // Init app
@@ -74,7 +74,7 @@ io.sockets.on('connection', function (socket) {
 			stream = T.stream('statuses/filter', { track: track_keywords });
 
 			stream.on('tweet', function (tweet) {
-				console.log(tweet);
+				// console.log(tweet);
 				// Only broadcast when the users are connected
 				if (users.length > 0) {
 					// Either we braodast or send it to the user who started the stream
@@ -94,9 +94,9 @@ io.sockets.on('connection', function (socket) {
 	socket.on('start search', function () {
 		stream = null;
 		console.log('Starting Search....');
-		T.get('search/tweets', { q: search_keywords, count: 100 }, function(err, data, response) {
-			console.log(err);
-			console.log(data);
+		T.get('search/tweets', { q: search_keywords, count: 20 }, function(err, data, response) {
+			// console.log(err);
+			// console.log(data);
 			socket.emit('search tweets', data);
 		});
 	});
