@@ -1,0 +1,38 @@
+.cont {
+	border: 1px solid #aaa;
+}
+.cont h4 {
+	background: #B9EDFA;
+	display: block;
+	padding: 10px;
+	margin: 0;
+}
+.cont {
+	display: inline-block;
+	margin: 0 10px;
+	width: 40%;
+}
+.cont .list {
+	height: 400px;
+	overflow: auto;
+}
+.tweet {
+	border: 1px solid #aaa;
+	border-left: none;
+	border-right: none;
+	margin: 5px 0;
+	overflow: hidden;
+	padding: 5px;
+}
+.tweet:last-child {
+	border-bottom: none;
+}
+
+.tweet .pic {
+	border: 2px solid #ddd;
+	float: left;
+	margin: 0 10px 0 0;
+}
+.tweet .text {
+	color: #fe5000;
+}

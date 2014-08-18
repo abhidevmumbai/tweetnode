@@ -16,14 +16,14 @@ var client = {
 			socket = io.connect(this.server_url, { 'forceNew': true });
 
 			socket.on('connect', function (r) {
-				// socket.emit('start trackStream');
-				socket.emit('start search');
+				socket.emit('start trackStream');
+				// socket.emit('start search');
 			});
 
 			// Stream API new tweet
 			socket.on('new tweet', function (tweet) {
 				console.log('New tweet');
-				client.renderTweet(tweet);
+				client.renderTweet(tweet, client.tracks_cont);
 				console.log(tweet);
 			});
 
@@ -35,14 +35,14 @@ var client = {
 		}		
 	},
 
-	renderTweet: function (tweet) {
+	renderTweet: function (tweet, container) {
 		console.log(tweet);
         var img = '<img src="' + tweet.user.profile_image_url + '" />',
             elementHtml = '<div class="tweet">'
-		        				+ '<a href="https://twitter.com/' + tweet.user.screen_name + '" target="_blank">' + img + '</a>'
-		        				+ '<span>' + tweet.text + '</span>'
+		        				+ '<a class="pic" href="https://twitter.com/' + tweet.user.screen_name + '" target="_blank">' + img + '</a>'
+		        				+ '<span class="text">' + tweet.text + '</span>'
 		        			+ '</div>';
-        this.tweets_cont.prepend(elementHtml);
+        container.find('.list').prepend(elementHtml);
     },
 
     renderTweetList: function (tweets) {
@@ -50,7 +50,9 @@ var client = {
 		// for (index in tweets.statuses) {
 		// 	setTimeInterval(function () { this.renderTweet(tweets.statuses[index]); }, 500);
 		// }
-    }
+    },
+
+
 }
 
 $(document).ready(function () {

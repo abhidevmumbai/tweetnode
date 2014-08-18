@@ -5,12 +5,15 @@ head
 		title Home
 	meta(charset='utf-8')
 	meta(name='viewport', content='width=device-width, initial-scale=1.0')
-	link(href='static/css/main.css')
+	link(href='static/css/main.css' rel='stylesheet')
 body
-	#tracks_cont
+	#tracks_cont.cont
+		h4 Tracks Stream
+		.list
 
-	#tweets_cont
-
+	#search_cont.cont
+		h4 Search
+		.list
 	script(src='socket.io/socket.io.js')
 	script(src='http://code.jquery.com/jquery-1.10.1.min.js')
 	script(src='static/js/tweets.js')
