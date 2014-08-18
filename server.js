@@ -67,9 +67,11 @@ io.sockets.on('connection', function (socket) {
 		console.log('User connected ' + socket.id);
 	}
 
+	// Using the Stream API
 	socket.on('start stream', function () {
 		if (stream === null) {
 			tw.stream("statuses/filter", {
+				// 'locations':'-122.75,36.8,-121.75,37.8,-74,40,-73,41'
 				track: track
 			}, function (s) {
 				stream = s;
@@ -97,6 +99,15 @@ io.sockets.on('connection', function (socket) {
 
 				// Disconnect stream after five seconds
 				setTimeout(stream.destroy, 5000);
+			});
+		}
+	});
+
+	// Using the Search API
+	socket.on('start search', function () {
+		if (stream === null) {
+			tw.search("html5", {}, function (err, data) {
+				console.log(err);
 			});
 		}
 	});
