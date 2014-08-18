@@ -3,22 +3,24 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV='development'
 var express = require('express'),
 	util = require('util'),
 	http = require('http'),
-	twitter = require('ntwitter'),
+	twitter = require('twit'),
 	port = process.env.PORT || 3000;
 
 // Twitter account configuration
-var tw = new twitter({
+var T = new twitter({
 		consumer_key: 'v7PaG6aaPvtmdAo6VnSNeTHC8',
 		consumer_secret: 't0jUYGdI8R9GtimQxpo6PLgHgB6kvbpNpnrNzB8Z0BxeCUQ5DB',
-		access_token_key: '89122938-tBIb72limYikzyAGpRPlTWOm4ofYHp4SQZRmWEkG9',
+		access_token: '89122938-tBIb72limYikzyAGpRPlTWOm4ofYHp4SQZRmWEkG9',
 		access_token_secret: 'l8FjFLsJNcmhvlO963rrDixVbowr7buR0ZkIZUSsM81uE'
 	}),
 	stream = null,
-	track = "robin williams",
+	track_keywords = 'robin williams',
+	search_keywords = 'web since:2011-11-11'
 	users = [];
 
 // Init app
-var app = express();
+var app = express(),
+	stream = null;
 
 // configure Express
 app.configure(function() {
@@ -32,10 +34,6 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	// app.use(express.session({ secret: 'keyboard cat' }));
-	// Initialize Passport!  Also use passport.session() middleware, to support
-	// persistent login sessions (recommended).
-	// app.use(passport.initialize());
-	// app.use(passport.session());
 	app.use(app.router);
 	app.use(express.static(__dirname + '/public'));
 });
@@ -64,52 +62,43 @@ io.sockets.on('connection', function (socket) {
 	// Add the user if it doesn't exist in the user array
 	if (users.indexOf(socket.id) == -1) {
 		users.push(socket.id);
-		console.log('User connected ' + socket.id);
+		console.log('User ' + socket.id + ' connected successfully');
+		logConnectedUsers();
 	}
 
-	// Using the Stream API
-	socket.on('start stream', function () {
+	// Using the Stream API with 'track' for multiple keywords
+	socket.on('start trackStream', function () {
+		console.log('Starting Track stream....');
 		if (stream === null) {
-			tw.stream("statuses/filter", {
-				// 'locations':'-122.75,36.8,-121.75,37.8,-74,40,-73,41'
-				track: track
-			}, function (s) {
-				stream = s;
+			//  filter the twitter public stream by a comma separated list of keywords.
+			stream = T.stream('statuses/filter', { track: track_keywords });
 
-				stream.on('data', function (data) {
-					// Only broadcast when the users are connected
-					if (users.length >0) {
-						// Either we braodast or send it to the user who started the stream
-						// socket.emit('new tweet', data);
-						socket.broadcast.emit('new tweet', data);
-					} else {
-						// Destroy the stream if no user is connected
-						stream.destroy();
-						stream = null;
-					}
-				});
+			stream.on('tweet', function (tweet) {
+				console.log(tweet);
+				// Only broadcast when the users are connected
+				if (users.length > 0) {
+					// Either we braodast or send it to the user who started the stream
+					// socket.emit('new tweet', data);
+					socket.broadcast.emit('new tweet', tweet);
+				} else {
+					// Destroy the stream if no user is connected
+					stream = null;
+				}
 
-				stream.on('end', function (response) {
-					// Handle a disconnection
-				});
-
-				stream.on('destroy', function (response) {
-					// Handle a 'silent' disconnection from Twitter, no end/error event fired
-				});
-
-				// Disconnect stream after five seconds
-				setTimeout(stream.destroy, 5000);
 			});
 		}
 	});
 
+
 	// Using the Search API
 	socket.on('start search', function () {
-		if (stream === null) {
-			tw.search("html5", {}, function (err, data) {
-				console.log(err);
-			});
-		}
+		stream = null;
+		console.log('Starting Search....');
+		T.get('search/tweets', { q: search_keywords, count: 100 }, function(err, data, response) {
+			console.log(err);
+			console.log(data);
+			socket.emit('search tweets', data);
+		});
 	});
 
 	// User disconnected
@@ -120,11 +109,19 @@ io.sockets.on('connection', function (socket) {
             // Eliminates the user from the array
             users.splice(index, 1);
         }
+        logConnectedUsers();
 	});
 
 	// Emits signal when the user is connected sending
     // the tracking words the app it's using
-    socket.emit("connected", {
-        tracking: track
-    });
+    // socket.emit("connected", {
+    //     tracking: track,
+    //     search: search_keywords
+    // });
 });
+
+
+// Method to log total connected users
+function logConnectedUsers () {
+	console.log('Total users: ' + users.length);
+}
