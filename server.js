@@ -14,7 +14,8 @@ var T = new twitter({
 		access_token_secret: 'l8FjFLsJNcmhvlO963rrDixVbowr7buR0ZkIZUSsM81uE'
 	}),
 	stream = null,
-	track_keywords = 'css, html',
+	language = 'en',
+	track_keywords = 'nrl, nba, nfl',
 	search_keywords = 'html5 since:2013-11-11',
 	users = [];
 
@@ -71,7 +72,7 @@ io.sockets.on('connection', function (socket) {
 		console.log('Starting Track stream....');
 		if (stream === null) {
 			//  filter the twitter public stream by a comma separated list of keywords.
-			stream = T.stream('statuses/filter', { track: track_keywords });
+			stream = T.stream('statuses/filter', { track: track_keywords, language: language });
 
 			stream.on('tweet', function (tweet) {
 				// console.log(tweet);
@@ -94,10 +95,10 @@ io.sockets.on('connection', function (socket) {
 	socket.on('start search', function () {
 		stream = null;
 		console.log('Starting Search....');
-		T.get('search/tweets', { q: search_keywords, count: 20 }, function(err, data, response) {
+		T.get('search/tweets', { q: search_keywords, count: 20, language: language }, function(err, data, response) {
 			// console.log(err);
 			// console.log(data);
-			socket.emit('search tweets', data);
+			socket.emit('search tweets', {data: data, keywords: search_keywords});
 		});
 	});
 
