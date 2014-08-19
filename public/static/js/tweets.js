@@ -6,7 +6,7 @@ var client = {
 	// server_url: 'http://192.168.0.207:3000/',
 	server_url: 'http://localhost:3000/',
 	users: [],
-	tweetArray: [],
+	tweetArray: [], // Stream Tweet array
 	tweetDelay: 3000,
 	init: function () {
 		console.log('Init...');
@@ -26,7 +26,7 @@ var client = {
 			socket = io.connect(this.server_url);
 
 			socket.on('connect', function (r) {
-				socket.emit('start trackStream');
+				// socket.emit('start trackStream');
 				// socket.emit('start search');
 			});
 
@@ -38,12 +38,14 @@ var client = {
 
 			// Search API tweets
 			socket.on('search tweets', function (tweets) {
-				console.log('Search tweet results');
-				client.renderTweetList(tweets.data.statuses, client.search_cont);
+				console.log('Received Search tweet results');
+				console.log(tweets);
+				client.renderTweetList(tweets.statuses, client.search_cont);
 			});
 		}
 	},
 
+	// Method to update the Tweets Array with the new incoming tweet
 	updateTweetsArray: function (tweet) {
 		// Adding the new tweet to the start of the array
 		this.tweetArray.unshift(tweet);
@@ -51,7 +53,6 @@ var client = {
 
 	// Method for rendering single tweet object
 	renderTweet: function (tweet, container) {
-		// console.log(tweet);
         var list = container.find('.list'),
 			img = '<img src="' + tweet.user.profile_image_url + '" />',
             elementHtml = '<div class="tweet">'+
@@ -84,7 +85,10 @@ var client = {
 
 		$('#searchBtn').click(function (e) {
 			e.preventDefault();
-			socket.emit('start search');
+			// Taking the search keywords from client
+			var keywords = $(this).siblings('.keywords').text();
+
+			socket.emit('start search',{keywords: keywords});
 		});
 	}
 

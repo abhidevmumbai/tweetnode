@@ -10,11 +10,13 @@ body
 	#tracks_cont.cont
 		h4 Tracks Stream
 			a#streamBtn.btn(href='#') Start Stream
+			span.keywords(contenteditable="true")
 		.list
 
 	#search_cont.cont
 		h4 Search
 			a#searchBtn.btn(href='#') Start Search
+			span.keywords(contenteditable="true") html5 since:2013-11-11
 		.list
 	script(src='socket.io/socket.io.js')
 	script(src='http://code.jquery.com/jquery-1.10.1.min.js')

@@ -79,7 +79,6 @@ io.sockets.on('connection', function (socket) {
 				// Only broadcast when the users are connected
 				if (users.length > 0) {
 					// Either we braodast or send it to the user who started the stream
-					// socket.emit('new tweet', data);
 					socket.broadcast.emit('new tweet', tweet);
 				} else {
 					// Destroy the stream if no user is connected
@@ -92,13 +91,16 @@ io.sockets.on('connection', function (socket) {
 
 
 	// Using the Search API
-	socket.on('start search', function () {
-		stream = null;
-		console.log('Starting Search....');
-		T.get('search/tweets', { q: search_keywords, count: 20, language: language }, function(err, data, response) {
+	socket.on('start search', function (obj) {
+		// Update the keywords from the client
+		search_keywords = obj.keywords;
+
+		console.log('Starting Search with keywords: ' + search_keywords);
+
+		T.get('search/tweets', { q: search_keywords, count: 5, language: language }, function(err, data, response) {
 			// console.log(err);
 			// console.log(data);
-			socket.emit('search tweets', {data: data, keywords: search_keywords});
+			socket.emit('search tweets', data);
 		});
 	});
 
