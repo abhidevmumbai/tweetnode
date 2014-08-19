@@ -14,7 +14,7 @@ var client = {
 
 		// Initiate the websocket server connection
 		this.connectToWebsocket();
-		this.bindEvents();				
+		this.bindEvents();
 	},
 
 	// Method for handling the websocket server connection and events
@@ -46,50 +46,50 @@ var client = {
 	renderTweet: function (tweet, container) {
 		// console.log(tweet);
         var img = '<img src="' + tweet.user.profile_image_url + '" />',
-            elementHtml = '<div class="tweet">'
-		        				+ '<a class="pic" href="https://twitter.com/' + tweet.user.screen_name + '" target="_blank">' + img + '</a>'
-		        				+ '<span class="text">' + tweet.text + '</span>'
-		        				+ '<p class="date">' + tweet.created_at + '</p>'
-		        			+ '</div>';
+            elementHtml = '<div class="tweet">'+
+							'<a class="pic" href="https://twitter.com/' + tweet.user.screen_name + '" target="_blank">' + img + '</a>'+
+							'<span class="text">' + tweet.text + '</span>'+
+							'<p class="date">' + tweet.created_at + '</p>'+
+						'</div>';
 		elementHtml = $(elementHtml);
         
         // A timer to delay the display of tweets as a large amount of tweets are received
         setTimeout(function () {
-        	container.find('.list').prepend(elementHtml);
-        	elementHtml.slideDown('fast');
-        }, 5000);
+		container.find('.list').prepend(elementHtml);
+				elementHtml.slideDown('fast');
+		}, 5000);
     },
 
     // Method for rendering array of tweets object
     renderTweetList: function (tweets) {
 		console.log(tweets);
-		for (index in tweets.statuses) {
+		for (var index in tweets.statuses) {
 			client.renderTweet(tweets.statuses[index], client.search_cont);
 		}
 		// setInterval(function(){
-		// 	// every 1000ms take the oldest tweet of the array and render it
-		// 	var nextTweet = tweets.statuses.pop();
-		// 	if (nextTweet) {
-		// 		client.renderTweet(nextTweet, client.search_cont);
-		// 	}
+		// every 1000ms take the oldest tweet of the array and render it
+		//	var nextTweet = tweets.statuses.pop();
+		//	if (nextTweet) {
+		//		client.renderTweet(nextTweet, client.search_cont);
+		//	}
 		// }, 3000);
     },
 
     // Method for binding events to the UI elements
-    bindEvents: function () {
-    	$('#streamBtn').click(function (e) {
-    		e.preventDefault();
-    		socket.emit('start trackStream');
-    	});
+	bindEvents: function () {
+		$('#streamBtn').click(function (e) {
+			e.preventDefault();
+			socket.emit('start trackStream');
+		});
 
-    	$('#searchBtn').click(function (e) {
-    		e.preventDefault();
-    		socket.emit('start search');
-    	});
-    }
+		$('#searchBtn').click(function (e) {
+			e.preventDefault();
+			socket.emit('start search');
+		});
+	}
 
-}
+};
 
 $(document).ready(function () {
-	client.init();	
+	client.init();
 });
