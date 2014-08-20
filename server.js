@@ -17,6 +17,10 @@ var T = new twitter({
 	language = 'en',
 	track_keywords = 'nrl, nba, nfl',
 	search_keywords = 'html5 since:2013-11-11',
+	friends_list = null,
+	friends_obj_list = null,
+	predefined_lists = [],
+	predefined_obj_lists= null,
 	users = [];
 
 // Init app
@@ -67,6 +71,12 @@ io.sockets.on('connection', function (socket) {
 		logConnectedUsers();
 	}
 
+	//Store the Pre-defined lists
+	getPredefinedLists();
+
+	// Store the Friends list
+	getFriendsList(socket);
+
 	// Using the Stream API with 'track' for multiple keywords
 	socket.on('start trackStream', function () {
 		console.log('Starting Track stream....');
@@ -104,6 +114,20 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	// Using the Friends/Following list statuses API
+	socket.on('start predefined list tweets', function () {
+		// https://api.twitter.com/1.1/lists/statuses.json?slug=teams&owner_screen_name=MLS&count=1
+		T.get('lists/statuses', {list_id: 167301778, count: 50}, function(err, data, response) {
+			console.log('Fetching Pre-defined lists tweets');
+			// console.log(err);
+			// console.log(data);
+			socket.emit('predefined list tweets', data);
+		});
+	});
+	
+
+	
+
 	// User disconnected
 	socket.on('disconnect', function () {
 		// find and remove the user from the user array
@@ -123,6 +147,54 @@ io.sockets.on('connection', function (socket) {
     // });
 });
 
+
+// API call to get the Users predefined lists ids
+function getPredefinedLists (socket) {
+	// Empty the array
+	predefined_lists = [];
+	
+	// https://api.twitter.com/1.1/lists/list.json
+	T.get('lists/list', function(err, data, response) {
+		console.log('Fetching Pre-defined id list...');
+		// console.log(err);
+		// console.log(data);
+		predefined_obj_lists = data;
+
+		// Storing the predefined lists ids in an array
+		for (var i in predefined_obj_lists) {
+			predefined_lists.push(predefined_obj_lists[i].id);
+		}
+
+		console.log(predefined_lists.toString());
+	});
+}
+
+// API call to get the Users friends/following ids
+function getFriendsList (socket) {
+	// https://api.twitter.com/1.1/friends/ids.json
+	T.get('friends/ids', function(err, data, response) {
+		console.log('Fetching Friends id list...');
+		// console.log(err);
+		// console.log(data);
+		friends_list = data;
+
+		// Get the friends/folowing objects list
+		getFriendsObjectList(socket);
+	});
+}
+
+// API call to get the Users friends/following ids
+function getFriendsObjectList (socket) {
+	// https://api.twitter.com/1.1/friends/ids.json
+	T.get('users/lookup', { user_id: friends_list.ids.toString() }, function(err, data, response) {
+		console.log('Fetching Friends objects list...');
+		// console.log(err);
+		// console.log(data);
+		friends_obj_list = data;
+		socket.emit('friends list', friends_obj_list);
+	});
+}
+	
 
 // Method to log total connected users
 function logConnectedUsers () {
